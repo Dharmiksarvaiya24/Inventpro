@@ -43,7 +43,7 @@ export default {
         console.log("Response:", response.data);
         this.errorMessage = ""; 
         alert("Login Successful!");
-        this.$router.push("/dashbord"); 
+        this.$router.push(`/dashboard/${this.username}`);  
       } catch (error) {
         this.errorMessage = error.response ? error.response.data.message : "Invalid user  !";
       }
