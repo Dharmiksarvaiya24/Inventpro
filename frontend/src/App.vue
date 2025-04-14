@@ -11,7 +11,7 @@ import Signup from "./components/signup.vue";
 import dashboard from "./components/dashbord.vue";
 
 
-export default {
+export default { 
   components: {
     login, 
     Signup,

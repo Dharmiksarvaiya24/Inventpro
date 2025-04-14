@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-// Define Schema
+
 const userSchema = new mongoose.Schema({
     email: String,
     password: String,
@@ -8,11 +8,10 @@ const userSchema = new mongoose.Schema({
 });
 
 const newuserSchema = new mongoose.Schema({
-    username: String  // ✅ Make sure field name matches frontend
+    username: String 
 });
 
-// Define Models
 const User = mongoose.model("User", userSchema);
 const NewUser = mongoose.model("NewUser", newuserSchema);
 
-module.exports = { User, NewUser };  // ✅ Ensure correct export
+module.exports = { User, NewUser };  
