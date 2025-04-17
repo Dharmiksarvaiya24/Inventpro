@@ -8,15 +8,8 @@
     </div>
 
     <div class="actions">
-      <button class="button button-secondary" @click="$emit('edit-user', user)">
-        ✏️
-      </button>
-      <button class="button button-primary" @click="$emit('view-user', user)">
-        👁️
-      </button>
-      <button class="button button-danger" @click="confirmDelete">
-        🗑️
-      </button>
+      <button class="button button-secondary" @click="openEditPointModal">✏️</button>
+      <button class="button button-danger" @click="confirmDelete">🗑️</button>
     </div>
 
     <div v-if="showConfirmation" class="modal-backdrop" @click="showConfirmation = false">
@@ -26,6 +19,18 @@
         <div class="modal-actions">
           <button class="button button-secondary" @click="showConfirmation = false">Cancel</button>
           <button class="button button-danger" @click="deleteUser">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="editpoint" class="modal-backdrop" @click="editpoint = false">
+      <div class="modal-content" @click.stop>
+        <h4>Edit Points</h4>
+        <input type="number" v-model.number="pointChange" placeholder="Enter points" class="input" />
+        <textarea v-model="description" placeholder="Enter description" class="textarea"></textarea>
+        <div class="modal-actions">
+          <button class="button button-secondary" @click="editpoint = false">Cancel</button>
+          <button class="button button-primary" @click="submitPoints">Submit</button>
         </div>
       </div>
     </div>
@@ -44,7 +49,10 @@ export default {
   },
   data() {
     return {
-      showConfirmation: false
+      showConfirmation: false,
+      editpoint: false,
+      pointChange: 0,
+      description: ''
     };
   },
   methods: {
@@ -56,8 +64,28 @@ export default {
         await axios.post('http://localhost:3000/deleteuser', { id: this.user._id });
         this.$emit('user-deleted', this.user._id);
         this.showConfirmation = false;
+        window.location.reload();
       } catch (error) {
         console.error('Error deleting user:', error);
+      }
+    },
+    openEditPointModal() {
+      this.editpoint = true;
+    },
+    async submitPoints() {
+      try {
+        await axios.post('http://localhost:3000/updatepoint', {
+          id: this.user._id,
+          points: this.pointChange,
+          description: this.description
+        });
+        this.user.points = this.pointChange;
+        this.user.pointDescription = this.description;
+        this.editpoint = false;
+        this.pointChange = 0;
+        this.description = '';
+      } catch (error) {
+        console.error('Error updating points:', error);
       }
     }
   }
@@ -79,7 +107,7 @@ export default {
 
 .user-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(67, 233, 123, 0.2);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(160, 26, 151, 0.2);
 }
 
 .user-info {
@@ -110,13 +138,15 @@ export default {
   gap: 0.5rem;
   padding: 0.4rem 1rem;
   border-radius: 2rem;
-  border: 1px solid rgba(56, 249, 215, 0.3);
-  box-shadow: 0 0 15px rgba(56, 249, 215, 0.15);
+  border: 1px solid rgba(203, 80, 181, 0.3);
+  box-shadow: 0 0 15px rgba(230, 56, 249, 0.15);
   transition: all 0.3s ease;
 }
 
-.point:hover {
-  transform: scale(1.05);
+.point-desc {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.25rem;
 }
 
 .diamond {
@@ -152,21 +182,35 @@ export default {
 }
 
 .button-primary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(90deg, #ff6ec4, #7873f5);
   color: white;
+}
+
+.button-primary:hover {
+  background: linear-gradient(90deg, #ff6ec4, #7873f5);
+  box-shadow: 0 0 10px rgba(255, 110, 196, 0.4), 0 0 10px rgba(120, 115, 245, 0.4);
 }
 
 .button-secondary {
-  background: linear-gradient(135deg, #4b5563, #374151);
-  color: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(90deg, #ff6ec4, #7873f5);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.button-secondary:hover {
+  background: linear-gradient(90deg, #ff6ec4, #7873f5);
+  box-shadow: 0 0 10px rgba(255, 110, 196, 0.4), 0 0 10px rgba(120, 115, 245, 0.4);
 }
 
 .button-danger {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(90deg, #ff6ec4, #7873f5);
   color: white;
 }
 
-/* Modal */
+.button-danger:hover {
+  background: linear-gradient(90deg, #ff6ec4, #7873f5);
+  box-shadow: 0 0 10px rgba(255, 110, 196, 0.4), 0 0 10px rgba(120, 115, 245, 0.4);
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -203,10 +247,29 @@ export default {
 .modal-content h4 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
-  background: linear-gradient(90deg, #43e97b, #38f9d7);
+  background: linear-gradient(90deg, #ff6ec4, #7873f5);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+}
+
+.input,
+.textarea {
+  width: 90%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #ff6ec4;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .modal-actions {
@@ -222,7 +285,6 @@ export default {
   padding: 0.5rem 1rem;
 }
 
-/* Responsive */
 @media (max-width: 640px) {
   .user-info {
     flex-direction: column;

@@ -12,7 +12,10 @@
     </div>
     <div class="navbar-right">
       <div class="user-section">
-        <img src="../assets/user.png" alt="User" class="user-avatar"  onclick="showfunctions"/>
+        <div class="history">
+          <img src="../assets/history.png" alt="History" style="width: 20px; height: 20px;" />
+        </div>
+        <img src="../assets/user.png" alt="User" class="user-avatar" onclick="showfunctions" />
         <span class="welcome-label">{{ userName }}</span>
       </div>
       <button class="logout-btn" @click="logout">Logout</button>
@@ -20,13 +23,16 @@
   </div>
 
   <div class="main-section">
-    <!-- Participants Box -->
     <div class="user-container">
       <h2 class="user-list-heading">Participations</h2>
       <button @click="showModal = true" class="add-user-btn">Add User</button>
-
       <div class="user-cards">
-        <UserCard v-for="user in users" :key="user.id" :user="user" />
+        <UserCard
+          v-for="user in users"
+          :key="user._id"
+          :user="user"
+          @user-updated="updateUser"
+        />
       </div>
 
       <div v-if="showModal" class="modal">
@@ -39,9 +45,8 @@
       </div>
     </div>
 
-    <!-- Rewards Box -->
     <div class="user-container">
-      <h2 class="user-list-heading">🎁 Rewards</h2>
+      <h2 class="user-list-heading">Rewards</h2>
       <button @click="showRewardModal = true" class="add-user-btn">Add Reward</button>
 
       <div class="user-cards">
@@ -75,6 +80,8 @@ export default {
       newuser: "",
       users: [],
       showRewardModal: false,
+      newReward: "",
+      rewards: []
     };
   },
   methods: {
@@ -113,6 +120,12 @@ export default {
       this.newReward = "";
       this.showRewardModal = false;
       alert("Reward added successfully!");
+    },
+    updateUser(updatedUser) {
+      const index = this.users.findIndex(u => u._id === updatedUser._id);
+      if (index !== -1) {
+        this.users[index] = updatedUser;
+      }
     }
   },
   mounted() {
@@ -188,7 +201,26 @@ export default {
   align-items: center;
   gap: 0.5rem;
 }
+.history {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
 
+.history:hover {
+  transform: scale(1.1);
+}
+
+.history-icon {
+  width: 20px;
+  height: 20px;
+}
 .user-avatar {
   width: 40px;
   height: 40px;
